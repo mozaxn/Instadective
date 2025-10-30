@@ -22,6 +22,7 @@ def suppress_output():
             sys.stdout = old_stdout
             sys.stderr = old_stderr
 
+
 # Declare terminal width and version
 TERMINAL_WIDTH = shutil.get_terminal_size().columns
 VERSION = "0.1.0"
@@ -41,8 +42,10 @@ print(("DEVELOPED BY " + Style.BRIGHT + "ZAXN" + Style.RESET_ALL).center(TERMINA
 print((Style.DIM + "mozaxn@protonmail.com" + Style.RESET_ALL).center(TERMINAL_WIDTH+8))
 print("\n\n")
 
+# Function for finding non-followers
 def find_nonfollowers(session_id: str) -> None:
-
+    """Finds accounts on Instagram you follow but don't follow you back."""
+    
     # Create an instagrapi Client
     with yaspin(text="Processing..."):
 

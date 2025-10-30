@@ -4,6 +4,7 @@ import argparse
 from .core import find_nonfollowers
 
 def main():
+
     # Create a parser
     parser = argparse.ArgumentParser()
 
@@ -13,6 +14,7 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
+    # Execute the main command
     find_nonfollowers(args.sessionid)
 
 if __name__ == "__main__":
