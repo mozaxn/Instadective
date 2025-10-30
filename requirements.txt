@@ -1,0 +1,4 @@
+colorama==0.4.6
+instagrapi==2.2.1
+pyfiglet==1.0.4
+yaspin==3.3.0

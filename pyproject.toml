@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0","wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "instadective"
+version = "0.1.0"
+description = "Find Instagram accounts you follow that don't follow you back"
+readme = "README.md"
+license = { text = "GPL-3.0" }
+authors = [{ name = "ZAXN", email = "mozaxn@protonmail.com" }]
+requires-python = ">=3.11"
+dependencies = [
+    "colorama==0.4.6",
+    "instagrapi==2.2.1",
+    "pyfiglet==1.0.4",
+    "yaspin==3.3.0"
+    ]
+
+[project.scripts]
+instadective = "instadective.cli:main"
