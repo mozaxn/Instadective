@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from .core import find_nonfollowers
+from .core import *
 
 def main():
 
@@ -9,13 +9,28 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Add arguments to the parser
-    parser.add_argument("-s", "--sessionid", required=True, help="Instagram Session ID")
+    parser.add_argument("-s", "--sessionid", required=False, help="Your Instagram SESSION_ID")
+    parser.add_argument("--scan", required=False, action="store_true", help="Perform core scan. This displays your followers and following. Use with flag -o to save the results to a file.")
+    parser.add_argument("-o", "--out", required=False, help="Save the output of a scan to a directory. Mention the directory without the '/' at the end.")
+    parser.add_argument("-n", "--non-follow", required=False, action="store_true", help="Identify accounts you follow but don't follow you back.")
 
     # Parse the arguments
     args = parser.parse_args()
 
     # Execute the main command
-    find_nonfollowers(args.sessionid)
+    session_id = args.sessionid
+    _core_scan = args.scan
+    _out = args.out
+    _non_follow_scan = args.non_follow
+
+    if _core_scan:
+        if _out:
+            core_scan(session_id, output=_out)
+        else:
+            core_scan(session_id)
+
+    elif _non_follow_scan:
+        find_nonfollowers(session_id)
 
 if __name__ == "__main__":
     main()
