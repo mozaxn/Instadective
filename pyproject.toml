@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "instadective"
-version = "0.1.0"
-description = "Find Instagram accounts you follow that don't follow you back"
+version = "1.0.0"
+description = "Instadective is a tool that analyzes your Instagram account to show various useful insights."
 readme = "README.md"
 license = { text = "GPL-3.0" }
 authors = [{ name = "ZAXN", email = "mozaxn@protonmail.com" }]
