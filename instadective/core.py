@@ -210,7 +210,7 @@ def comparison(scan1:str, scan2:str) -> None:
         unfollowed = [f for f in s2_following if f not in s1_following]
         followed = [f for f in s1_following if f not in s2_following]
 
-    print(f"{'='*TERMINAL_WIDTH}\n"+f"COMPARSION RESULTS".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
+    print(f"{'='*TERMINAL_WIDTH}\n"+"COMPARSION RESULTS".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
 
     print("SUMMARY:\n")
     print(f"In {diff_string},")
