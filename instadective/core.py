@@ -1,19 +1,23 @@
+"""The core module for Instadective containing all the functions."""
+
 # Imports
-from instagrapi import Client
-from pyfiglet import Figlet
 import shutil
-from yaspin import yaspin
 import time
 import json
-from datetime import datetime
-from colorama import Style, init
 import sys
 import os
 import contextlib
+from datetime import datetime
+from instagrapi import Client
+from pyfiglet import Figlet
+from yaspin import yaspin
+from colorama import Style, init
 
 # Used to suppress inherent errors in Instagrapi
 @contextlib.contextmanager
 def suppress_output():
+    """Used to suppress output of a code block. (stdout & stderr) both."""
+
     with open(os.devnull, 'w') as devnull:
         old_stdout = sys.stdout
         old_stderr = sys.stderr
@@ -30,8 +34,8 @@ TERMINAL_WIDTH = shutil.get_terminal_size().columns
 VERSION = "1.0.0"
 
 # Columns width standards for printing output
-col_width = 32
-names_per_row = TERMINAL_WIDTH // col_width
+COL_WIDTH = 32
+names_per_row = TERMINAL_WIDTH // COL_WIDTH
 
 # Initialise colorama
 init(autoreset=True)
@@ -52,7 +56,7 @@ print("\n\n")
 # Function for finding non-followers
 def find_nonfollowers(session_id: str) -> None:
     """Finds accounts on Instagram you follow but don't follow you back."""
-    
+
     # Create an instagrapi Client
     with yaspin(text="Performing non-follower scan..."):
 
@@ -93,7 +97,9 @@ def find_nonfollowers(session_id: str) -> None:
 
 # Core scan function
 def core_scan(session_id:str, output:str='') -> None:
-    """Performs a core scan and returns user's followers and following. If output=True, then saves the results to a file."""
+
+    """Performs a core scan and returns user's followers and following. 
+    If output=True, then saves the results to a file."""
 
     # Create an instagrapi Client
     with yaspin(text="Performing core scan..."):
@@ -123,8 +129,12 @@ def core_scan(session_id:str, output:str='') -> None:
 
 
     # Print core scan header
-    print(f"{'='*TERMINAL_WIDTH}\n"+f"CORE SCAN RESULTS for @{client_username}".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
-    print("/=========\\".center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS|".center(TERMINAL_WIDTH) + "\n" + "\\=========/".center(TERMINAL_WIDTH))
+    print(f"{'='*TERMINAL_WIDTH}\n"+
+          f"CORE SCAN RESULTS for @{client_username}".center(TERMINAL_WIDTH)+
+          f"\n{'='*TERMINAL_WIDTH}\n")
+
+    print("/=========\\".center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS|".center(TERMINAL_WIDTH) +
+          "\n" + "\\=========/".center(TERMINAL_WIDTH))
 
     # Store the usernames of followers
     fo_usernames = list()
@@ -134,9 +144,10 @@ def core_scan(session_id:str, output:str='') -> None:
 
     # Print the usernames with proper formatting in columns
     for i in range(0, len(fo_usernames), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in fo_usernames[i:i+names_per_row]))
+        print("".join(f"{x:<{COL_WIDTH}}" for x in fo_usernames[i:i+names_per_row]))
 
-    print("/=========\\".center(TERMINAL_WIDTH) + "\n" + "|FOLLOWING|".center(TERMINAL_WIDTH) + "\n" + "\\=========/".center(TERMINAL_WIDTH))
+    print("/=========\\".center(TERMINAL_WIDTH) + "\n" + "|FOLLOWING|".center(TERMINAL_WIDTH) +
+          "\n" + "\\=========/".center(TERMINAL_WIDTH))
 
     # Store the usernames of 'following' accounts
     fi_usernames = list()
@@ -145,9 +156,10 @@ def core_scan(session_id:str, output:str='') -> None:
         fi_usernames.append("@" + username)
 
     for i in range(0, len(fi_usernames), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in fi_usernames[i:i+names_per_row]))
+        print("".join(f"{x:<{COL_WIDTH}}" for x in fi_usernames[i:i+names_per_row]))
 
-    print(f"{'='*TERMINAL_WIDTH}\n"+"END OF SCAN RESULTS".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
+    print(f"{'='*TERMINAL_WIDTH}\n"+"END OF SCAN RESULTS".center(TERMINAL_WIDTH)+
+          f"\n{'='*TERMINAL_WIDTH}\n")
 
     # If output=True, then output the results to a file
     if output:
@@ -164,12 +176,12 @@ def core_scan(session_id:str, output:str='') -> None:
         # Check if the output directory exists. If not, create it.
         if not os.path.isdir(output):
             os.mkdir(output)
-        
+
         # Write the scan results
-        with open(f"{output}/Instadective-CS-{timestamp}.json", 'w') as f:
+        with open(f"{output}/Instadective-CS-{timestamp}.json", 'w', encoding='utf-8') as f:
             json.dump(json_dict, f, indent=4)
             f.close()
-        
+
         print(f"Scan results saved to '{output}/Instadective-CS-{timestamp}.json'.")
 
 # Comparing scans
@@ -179,10 +191,10 @@ def comparison(scan1:str, scan2:str) -> None:
     # If scan1 and scan2 are not valid files, return an error
     if not (os.path.isfile(scan1) and os.path.isfile(scan2)):
         raise FileNotFoundError("One or more of the scan files don't exist!")
-    
+
     # Load the scans
-    scan1_results = json.load(open(scan1, 'r'))
-    scan2_results = json.load(open(scan2, 'r'))
+    scan1_results = json.load(open(scan1, 'r', encoding='utf-8'))
+    scan2_results = json.load(open(scan2, 'r', encoding='utf-8'))
 
     # Store the timestamp to check which scan occured first
     scan1_time = scan1_results["timestamp"]
@@ -224,7 +236,8 @@ def comparison(scan1:str, scan2:str) -> None:
         followed = [f for f in s1_following if f not in s2_following]
 
     # Print comparison headers
-    print(f"{'='*TERMINAL_WIDTH}\n"+"COMPARSION RESULTS".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
+    print(f"{'='*TERMINAL_WIDTH}\n"+"COMPARSION RESULTS".center(TERMINAL_WIDTH)+
+          f"\n{'='*TERMINAL_WIDTH}\n")
 
     print("SUMMARY:\n")
     print(f"In {diff_string},")
@@ -235,30 +248,39 @@ def comparison(scan1:str, scan2:str) -> None:
 
     # Print the list of followers gained
     print("="*TERMINAL_WIDTH)
-    print(("/"+ "="*16 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS GAINED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*16 + "/").center(TERMINAL_WIDTH))
+    print(("/"+ "="*16 + "\\").center(TERMINAL_WIDTH) +
+          "\n" + "|FOLLOWERS GAINED|".center(TERMINAL_WIDTH) +
+          "\n" + ("\\"+ "="*16 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followers_gained), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in followers_gained[i:i+names_per_row]))
+        print("".join(f"{x:<{COL_WIDTH}}" for x in followers_gained[i:i+names_per_row]))
 
     # Print the list of followers lost
     print("="*TERMINAL_WIDTH)
-    print(("/"+ "="*14 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS LOST|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*14 + "/").center(TERMINAL_WIDTH))
+    print(("/"+ "="*14 + "\\").center(TERMINAL_WIDTH) +
+          "\n" + "|FOLLOWERS LOST|".center(TERMINAL_WIDTH) +
+          "\n" + ("\\"+ "="*14 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followers_lost), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in followers_lost[i:i+names_per_row]))
+        print("".join(f"{x:<{COL_WIDTH}}" for x in followers_lost[i:i+names_per_row]))
 
     # Print the list of new accounts followed
     print("="*TERMINAL_WIDTH)
-    print(("/"+ "="*8 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*8 + "/").center(TERMINAL_WIDTH))
+    print(("/"+ "="*8 + "\\").center(TERMINAL_WIDTH) +
+          "\n" + "|FOLLOWED|".center(TERMINAL_WIDTH) +
+          "\n" + ("\\"+ "="*8 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followed), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in followed[i:i+names_per_row]))
+        print("".join(f"{x:<{COL_WIDTH}}" for x in followed[i:i+names_per_row]))
 
     # Print the list of accounts unfollowed
     print("="*TERMINAL_WIDTH)
-    print(("/"+ "="*10 + "\\").center(TERMINAL_WIDTH) + "\n" + "|UNFOLLOWED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*10 + "/").center(TERMINAL_WIDTH))
+    print(("/"+ "="*10 + "\\").center(TERMINAL_WIDTH) + "\n" +
+          "|UNFOLLOWED|".center(TERMINAL_WIDTH) + "\n" + 
+          ("\\"+ "="*10 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(unfollowed), names_per_row):
-        print("".join(f"{x:<{col_width}}" for x in unfollowed[i:i+names_per_row]))
-    
-    print(f"{'='*TERMINAL_WIDTH}\n"+"END OF COMPARISON".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
+        print("".join(f"{x:<{COL_WIDTH}}" for x in unfollowed[i:i+names_per_row]))
+
+    print(f"{'='*TERMINAL_WIDTH}\n"+"END OF COMPARISON".center(TERMINAL_WIDTH)+
+          f"\n{'='*TERMINAL_WIDTH}\n")
