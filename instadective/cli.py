@@ -18,12 +18,13 @@ def main():
     # Parse the arguments
     args = parser.parse_args()
 
-    # Execute the main command
+    # Assign arguments to variables
     session_id = args.sessionid
     _core_scan = args.scan
     _out = args.out
     _non_follow_scan = args.non_follow
     
+    # Check if comparison is being asked for, if so, store the scan files in variables
     if args.compare:
         scan1, scan2 = args.compare
 

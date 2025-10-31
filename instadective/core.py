@@ -29,7 +29,7 @@ def suppress_output():
 TERMINAL_WIDTH = shutil.get_terminal_size().columns
 VERSION = "1.0.0"
 
-# Columns width standards
+# Columns width standards for printing output
 col_width = 32
 names_per_row = TERMINAL_WIDTH // col_width
 
@@ -48,6 +48,7 @@ print(("DEVELOPED BY " + Style.BRIGHT + "ZAXN" + Style.RESET_ALL).center(TERMINA
 print((Style.DIM + "mozaxn@protonmail.com" + Style.RESET_ALL).center(TERMINAL_WIDTH+8))
 print("\n\n")
 
+
 # Function for finding non-followers
 def find_nonfollowers(session_id: str) -> None:
     """Finds accounts on Instagram you follow but don't follow you back."""
@@ -55,6 +56,7 @@ def find_nonfollowers(session_id: str) -> None:
     # Create an instagrapi Client
     with yaspin(text="Performing non-follower scan..."):
 
+        # Suppress all output from Instagrapi
         with suppress_output():
             cl = Client()
 
@@ -73,6 +75,7 @@ def find_nonfollowers(session_id: str) -> None:
 
     time.sleep(0.5)
 
+    # Store the UIDs only
     followers = list(followers_dict.keys())
     following = list(following_dict.keys())
 
@@ -87,6 +90,7 @@ def find_nonfollowers(session_id: str) -> None:
 
         print(f"\t- {full_name} ({username})")
 
+
 # Core scan function
 def core_scan(session_id:str, output:str='') -> None:
     """Performs a core scan and returns user's followers and following. If output=True, then saves the results to a file."""
@@ -94,6 +98,7 @@ def core_scan(session_id:str, output:str='') -> None:
     # Create an instagrapi Client
     with yaspin(text="Performing core scan..."):
 
+        # Supress output from Instagrapi
         with suppress_output():
             cl = Client()
 
@@ -117,6 +122,7 @@ def core_scan(session_id:str, output:str='') -> None:
     following = list(following_dict.keys())
 
 
+    # Print core scan header
     print(f"{'='*TERMINAL_WIDTH}\n"+f"CORE SCAN RESULTS for @{client_username}".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
     print("/=========\\".center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS|".center(TERMINAL_WIDTH) + "\n" + "\\=========/".center(TERMINAL_WIDTH))
 
@@ -126,7 +132,7 @@ def core_scan(session_id:str, output:str='') -> None:
         username = dict(followers_dict[fo])['username']
         fo_usernames.append("@" + username)
 
-
+    # Print the usernames with proper formatting in columns
     for i in range(0, len(fo_usernames), names_per_row):
         print("".join(f"{x:<{col_width}}" for x in fo_usernames[i:i+names_per_row]))
 
@@ -170,12 +176,15 @@ def core_scan(session_id:str, output:str='') -> None:
 def comparison(scan1:str, scan2:str) -> None:
     """Compare two core scans to identify changes in followers and following."""
 
+    # If scan1 and scan2 are not valid files, return an error
     if not (os.path.isfile(scan1) and os.path.isfile(scan2)):
         raise FileNotFoundError("One or more of the scan files don't exist!")
     
+    # Load the scans
     scan1_results = json.load(open(scan1, 'r'))
     scan2_results = json.load(open(scan2, 'r'))
 
+    # Store the timestamp to check which scan occured first
     scan1_time = scan1_results["timestamp"]
     scan2_time = scan2_results["timestamp"]
 
@@ -184,6 +193,7 @@ def comparison(scan1:str, scan2:str) -> None:
     s1_date = datetime.strptime(scan1_time, fmt)
     s2_date = datetime.strptime(scan2_time, fmt)
 
+    # Compute the duration between the two scans
     diff = max(s1_date, s2_date) - min(s1_date, s2_date)
     days = diff.days
     seconds = diff.seconds
@@ -193,23 +203,27 @@ def comparison(scan1:str, scan2:str) -> None:
 
     diff_string = f"{days} days, {hours} hours, {minutes} minutes, {secs} seconds"
 
+    # Store the followers and following of both scans
     s1_followers = scan1_results["followers"]
     s2_followers = scan2_results["followers"]
     s1_following = scan1_results["following"]
     s2_following = scan2_results["following"]
 
+    # If scan1 happened first, then
     if min(s1_date, s2_date) == s1_date:
         followers_lost = [f for f in s1_followers if f not in s2_followers]
         followers_gained = [f for f in s2_followers if f not in s1_followers]
         unfollowed = [f for f in s1_following if f not in s2_following]
         followed = [f for f in s2_following if f not in s1_following]
 
+    # If scan2 happened first, then
     else:
         followers_lost = [f for f in s2_followers if f not in s1_followers]
         followers_gained = [f for f in s1_followers if f not in s2_followers]
         unfollowed = [f for f in s2_following if f not in s1_following]
         followed = [f for f in s1_following if f not in s2_following]
 
+    # Print comparison headers
     print(f"{'='*TERMINAL_WIDTH}\n"+"COMPARSION RESULTS".center(TERMINAL_WIDTH)+f"\n{'='*TERMINAL_WIDTH}\n")
 
     print("SUMMARY:\n")
@@ -219,24 +233,28 @@ def comparison(scan1:str, scan2:str) -> None:
     print(f"- You followed {len(followed)} new accounts")
     print(f"- You unfollowed {len(unfollowed)} accounts")
 
+    # Print the list of followers gained
     print("="*TERMINAL_WIDTH)
     print(("/"+ "="*16 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS GAINED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*16 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followers_gained), names_per_row):
         print("".join(f"{x:<{col_width}}" for x in followers_gained[i:i+names_per_row]))
 
+    # Print the list of followers lost
     print("="*TERMINAL_WIDTH)
     print(("/"+ "="*14 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWERS LOST|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*14 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followers_lost), names_per_row):
         print("".join(f"{x:<{col_width}}" for x in followers_lost[i:i+names_per_row]))
 
+    # Print the list of new accounts followed
     print("="*TERMINAL_WIDTH)
     print(("/"+ "="*8 + "\\").center(TERMINAL_WIDTH) + "\n" + "|FOLLOWED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*8 + "/").center(TERMINAL_WIDTH))
 
     for i in range(0, len(followed), names_per_row):
         print("".join(f"{x:<{col_width}}" for x in followed[i:i+names_per_row]))
 
+    # Print the list of accounts unfollowed
     print("="*TERMINAL_WIDTH)
     print(("/"+ "="*10 + "\\").center(TERMINAL_WIDTH) + "\n" + "|UNFOLLOWED|".center(TERMINAL_WIDTH) + "\n" + ("\\"+ "="*10 + "/").center(TERMINAL_WIDTH))
 
